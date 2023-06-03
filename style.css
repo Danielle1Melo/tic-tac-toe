@@ -16,6 +16,14 @@ body {
   );
 }
 
+.title {
+  font-size: 2.5rem;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  padding-top: 50px;
+}
+
 .board {
   display: grid;
   width: 100%;
@@ -25,6 +33,7 @@ body {
   align-content: center;
   align-items: center;
   justify-items: center;
+  padding-bottom: 229px;
   grid-template-columns: repeat(3, auto);
 }
 
@@ -118,10 +127,12 @@ body {
   right: 0;
   justify-content: center;
   align-items: center;
+  text-align: center;
   background-color: rgba(0, 0, 0, 0.8);
   flex-direction: column;
 }
 .winning-message-button {
+  font-family: "Quicksand", sans-serif;
   font-size: 2.5rem;
   background-color: rgb(128, 16, 169);
   padding: 10px 15px;
@@ -141,6 +152,59 @@ body {
   color: #fff;
   font-size: 4rem;
   font-weight: 700;
+}
+
+.namePlayer {
+  font-weight: 700;
+  font-size: 2.5rem;
+  display: none;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  flex-direction: column;
+}
+
+.input-name {
+  border-radius: 5px;
+  border: 0 none;
+  box-shadow: 0 0 0 0;
+  outline: 0;
+  padding: 10px;
+  margin: 8px;
+}
+
+.input-name::placeholder {
+  font-family: "Quicksand", sans-serif;
+  text-align: center;
+  color: rgb(153, 147, 147);
+}
+
+.start-button {
+  font-family: "Quicksand", sans-serif;
+  font-size: 2.5rem;
+  background-color: rgb(128, 16, 169);
+  padding: 2px 25px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  margin-top: 16px;
+  color: #fff;
+}
+
+.start-button:hover {
+  background-color: #fff;
+  color: rgb(128, 16, 169);
+}
+
+.show-namePlayer {
+  display: flex;
 }
 
 .show-winning-message {

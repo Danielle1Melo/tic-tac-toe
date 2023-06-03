@@ -5,6 +5,8 @@ const dataWinningMessageTextElement = document.querySelector(
 );
 const winningMessage = document.querySelector("[data-winning-message]");
 const restartButton = document.querySelector("[data-restart-message]");
+const namePlayerMessage = document.querySelector("[data-name-message]");
+const startButton = document.querySelector("[data-start-button]");
 
 let isCircleTurn = false;
 
@@ -20,6 +22,7 @@ const winningCombinations = [
 ];
 
 const startGame = () => {
+  namePlayerMessage.classList.add("show-namePlayer");
   for (const cell of cellElements) {
     cell.classList.remove("x");
     cell.classList.remove("circle");
@@ -28,7 +31,12 @@ const startGame = () => {
   }
 
   setBoardMoverClass();
+  startButton.addEventListener("click", getPlayerNameAndStart);
   winningMessage.classList.remove("show-winning-message");
+};
+
+const getPlayerNameAndStart = () => {
+  namePlayerMessage.classList.remove("show-namePlayer");
 };
 
 const endGame = (isDraw) => {
