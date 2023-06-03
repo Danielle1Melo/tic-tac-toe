@@ -104,6 +104,26 @@ const handleClick = (e) => {
   }
 };
 
-startGame();
+window.addEventListener("load", () => {
+  startGame();
 
-restartButton.addEventListener("click", startGame);
+  var ws = new WebSocket("ws://localhost:9999/");
+
+  ws.onopen = function () {
+    ws.send("Hi, from the client."); // this works
+    console.log("Connection opened...");
+  };
+
+  ws.onmessage = function (event) {
+    console.log("Message received..." + event.data);
+  };
+
+  ws.onclose = function () {
+    console.log("Connection closed...");
+  };
+
+  ws.send("Hi, from the client."); // doesn't work
+  ws.send("Hi, from the client."); // doesn't work
+});
+
+//restartButton.addEventListener("click", startGame);
