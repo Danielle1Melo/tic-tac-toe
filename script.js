@@ -7,7 +7,11 @@ const winningMessage = document.querySelector("[data-winning-message]");
 const restartButton = document.querySelector("[data-restart-message]");
 const namePlayerMessage = document.querySelector("[data-name-message]");
 const startButton = document.querySelector("[data-start-button]");
+const resetButton = document.getElementById("reset");
 
+let ws;
+let player = "";
+let amICircle = false;
 let isCircleTurn = false;
 
 const winningCombinations = [
@@ -22,7 +26,6 @@ const winningCombinations = [
 ];
 
 const startGame = () => {
-  namePlayerMessage.classList.add("show-namePlayer");
   for (const cell of cellElements) {
     cell.classList.remove("x");
     cell.classList.remove("circle");
@@ -31,21 +34,29 @@ const startGame = () => {
   }
 
   setBoardMoverClass();
-  startButton.addEventListener("click", getPlayerNameAndStart);
   winningMessage.classList.remove("show-winning-message");
 };
 
 const getPlayerNameAndStart = () => {
   namePlayerMessage.classList.remove("show-namePlayer");
+  player = document.getElementById("playerName").value;
+  ws.send(JSON.stringify({ kind: "newPlayer", name: player }));
 };
 
-const endGame = (isDraw) => {
+const endGame = (isDraw, winner) => {
   if (isDraw) {
     dataWinningMessageTextElement.innerText = "Empate!";
+    return;
+  }
+
+  if (winner == player) {
+    dataWinningMessageTextElement.innerText = amICircle
+      ? `${winner} (O) venceu!`
+      : `${winner} (X) venceu!`;
   } else {
-    dataWinningMessageTextElement.innerText = isCircleTurn
-      ? "O venceu!"
-      : "X venceu";
+    dataWinningMessageTextElement.innerText = amICircle
+      ? `${winner} (X) venceu!`
+      : `${winner} (O) venceu!`;
   }
 
   winningMessage.classList.add("show-winning-message");
@@ -90,48 +101,108 @@ const swapTurns = () => {
   setBoardMoverClass();
 };
 
+const mapCelToMatrix = [
+  [0, 0],
+  [0, 1],
+  [0, 2],
+
+  [1, 0],
+  [1, 1],
+  [1, 2],
+
+  [2, 0],
+  [2, 1],
+  [2, 2],
+];
+
+let mapMatricToCel = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+];
+
+const handleMovementFromPlayer = (row, col) => {
+  const idx = mapMatricToCel[row][col];
+  const cellToUpdate = cellElements[idx];
+
+  const classToAdd = amICircle ? "x" : "circle";
+  placeMark(cellToUpdate, classToAdd);
+};
+
 const handleClick = (e) => {
   //colocar X ou Circle
   const cell = e.target;
   const classToAdd = isCircleTurn ? "circle" : "x";
 
+  const rowAndCol =
+    mapCelToMatrix[Array.from(cell.parentNode.children).indexOf(cell)];
+
   placeMark(cell, classToAdd);
 
-  //Verificar vitória
-  const isWin = checkForWin(classToAdd);
-
-  //Verificar empate
-  const isDraw = checkForDraw();
-  if (isWin) {
-    endGame(false);
-  } else if (isDraw) {
-    endGame(true);
-  } else {
-    //Mudar símbolo
-    swapTurns();
-  }
+  ws.send(
+    JSON.stringify({
+      kind: "movement",
+      row: rowAndCol[0],
+      col: rowAndCol[1],
+      player: player,
+    })
+  );
 };
 
 window.addEventListener("load", () => {
-  startGame();
+  ws = new WebSocket("ws://44.211.167.143:9999/");
+  namePlayerMessage.classList.add("show-namePlayer");
 
-  var ws = new WebSocket("ws://localhost:9999/");
-
-  ws.onopen = function () {
-    ws.send("Hi, from the client."); // this works
-    console.log("Connection opened...");
-  };
+  ws.onopen = function () {};
 
   ws.onmessage = function (event) {
-    console.log("Message received..." + event.data);
+    let message = JSON.parse(event.data);
+    console.log(message);
+
+    if (message.kind == "join") {
+      if (message.isX) {
+        amICircle = false;
+        isCircleTurn = false;
+      } else {
+        amICircle = true;
+        isCircleTurn = true;
+      }
+
+      startGame();
+    }
+
+    if (message.kind == "movementCompleted") {
+      if (message.player == player) {
+        return;
+      }
+
+      handleMovementFromPlayer(message.row, message.col);
+      return;
+    }
+
+    if (message.kind == "gameEnd") {
+      if (message.draw) {
+        endGame(true, null);
+        return;
+      }
+
+      endGame(false, message.winner);
+      return;
+    }
   };
 
   ws.onclose = function () {
     console.log("Connection closed...");
   };
-
-  ws.send("Hi, from the client."); // doesn't work
-  ws.send("Hi, from the client."); // doesn't work
 });
 
-//restartButton.addEventListener("click", startGame);
+restartButton.addEventListener("click", () => {
+  player = prompt("Informe seu nome!");
+  ws.send(JSON.stringify({ kind: "newPlayer", name: player }));
+});
+
+resetButton.addEventListener("click", () => {
+  ws.send(JSON.stringify({ kind: "reset" }));
+});
+
+startButton.addEventListener("click", getPlayerNameAndStart);
