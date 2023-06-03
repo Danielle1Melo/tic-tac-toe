@@ -150,8 +150,8 @@ const handleClick = (e) => {
 };
 
 window.addEventListener("load", () => {
-  ws = new WebSocket("ws://44.211.167.143:9999/");
   namePlayerMessage.classList.add("show-namePlayer");
+  ws = new WebSocket("ws://44.211.167.143:9999/");
 
   ws.onopen = function () {};
 
@@ -197,7 +197,7 @@ window.addEventListener("load", () => {
 });
 
 restartButton.addEventListener("click", () => {
-  player = prompt("Informe seu nome!");
+  namePlayerMessage.classList.add("show-namePlayer");
   ws.send(JSON.stringify({ kind: "newPlayer", name: player }));
 });
 
