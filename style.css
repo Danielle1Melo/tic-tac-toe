@@ -198,6 +198,19 @@ body {
   color: #fff;
 }
 
+#reset {
+  font-family: "Quicksand", sans-serif;
+  font-size: 1rem;
+  background-color: #fff;
+  padding: 2px 25px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  margin: 8px;
+  color: rgb(128, 16, 169);
+}
+
 .start-button:hover {
   background-color: #fff;
   color: rgb(128, 16, 169);
